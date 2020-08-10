@@ -4,55 +4,60 @@ import 'package:intl/intl.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
-  TransactionList(this.transactions);
+  final Function deleteTransaction;
+  TransactionList(this.transactions,this.deleteTransaction);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
-      child: SingleChildScrollView(
-        child: Column(
-          children: transactions.map((transaction) {
-            return Card(
-                child: Row(
+      height: 600,
+      child: transactions.isEmpty
+          ? Column(
               children: <Widget>[
+                Text(
+                  'No Transactions added Yet',
+                  style: Theme.of(context).textTheme.title,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.purple, width: 2),
-                  ),
-                  child: Text(
-                    '₹${transaction.amount}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.purple,
-                    ),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      transaction.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(DateFormat.yMMMd().format(transaction.date),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        )),
-                  ],
-                ),
+                    height: 200,
+                    child: Image.asset(
+                      'assets/images/waiting.png',
+                      fit: BoxFit.cover,
+                    )),
               ],
-            ));
-          }).toList(),
-        ),
-      ),
+            )
+          : ListView.builder(
+              itemBuilder: (ctx, index) {
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                  elevation: 5,
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 30,
+                      child: Padding(
+                          padding: EdgeInsets.all(6),
+                          child: FittedBox(
+                              child: Text('₹${transactions[index].amount}'))),
+                    ),
+                    title: Text(
+                      transactions[index].title,
+                      style: Theme.of(context).textTheme.title,
+                    ),
+                    subtitle: Text(
+                        DateFormat.yMMMMd().format(transactions[index].date)),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      color: Theme.of(context).errorColor,
+                      onPressed:() => deleteTransaction(transactions[index].id),
+                    ),
+                  ),
+                );
+              },
+              itemCount: transactions.length,
+            ),
     );
   }
 }
